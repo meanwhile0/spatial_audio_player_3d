@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="AcousticMaterial" format=3 uid="uid://bylkerx730qm1"]
+
+[ext_resource type="Script" uid="uid://d0issaswnve1e" path="res://addons/danikakes.spatial_audio/acoustic_material.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
