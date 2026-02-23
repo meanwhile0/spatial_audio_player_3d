@@ -555,11 +555,6 @@ static func set_global_effects_disabled(disabled: bool) -> void:
 
 #region SOUND SPEED DELAY
 
-## Overrides [method AudioStreamPlayer3D.play] to optionally delay playback
-## based on the listener's distance and [param speed_of_sound].
-func play(from_position: float = 0.0) -> void:
-	_play_with_optional_delay(from_position)
-
 
 ## Call this directly if the [method play] override isn't dispatched
 ## (e.g. the node was created as a plain [AudioStreamPlayer3D]).
@@ -616,11 +611,6 @@ func _deferred_play(from_position: float) -> void:
 		super.play(from_position)
 		emit_signal("spatial_audio_playback_started")
 
-
-func stop() -> void:
-	# Override to emit a stopped signal
-	super.stop()
-	emit_signal("spatial_audio_playback_stopped")
 #endregion
 
 #region LIFECYCLE
@@ -1110,7 +1100,7 @@ func _update_volume_attenuation(listener: Node3D) -> void:
 	# Interpolate in linear amplitude (not dB) for perceptually smoother falloff.
 	var min_gain := pow(10.0, minimum_volume_db / 20.0)
 	var base_gain := pow(10.0, _base_volume_db / 20.0)
-	var gain := lerp(min_gain, base_gain, att)
+	var gain = lerp(min_gain, base_gain, att)
 	gain = max(gain, 1e-8)
 	_target_volume_db = 20.0 * log(gain) / log(10.0)
 

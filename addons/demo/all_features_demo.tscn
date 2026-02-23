@@ -1,32 +1,25 @@
 [gd_scene format=4 uid="uid://cnimdqwnj27p4"]
 
-[ext_resource type="PackedScene" uid="uid://cc1m2a1obsyn4" path="res://addons/danikakes.spatial_audio/demo/addons/fpc/character.tscn" id="1_1bmib"]
-[ext_resource type="Texture2D" uid="uid://ddqjqiqdkqe5a" path="res://addons/danikakes.spatial_audio/demo/addons/checker_white_512x512.svg" id="2_4f8ld"]
-[ext_resource type="Script" uid="uid://cjpnhbhllv2v7" path="res://addons/danikakes.spatial_audio/acoustic_body.gd" id="3_4f8ld"]
-[ext_resource type="PackedScene" uid="uid://doh7uwfugewuk" path="res://addons/danikakes.spatial_audio/demo/models/speaker.tscn" id="3_5iubo"]
-[ext_resource type="Resource" uid="uid://cid3a57sat63i" path="res://addons/danikakes.spatial_audio/presets/glass.tres" id="4_op4yf"]
-[ext_resource type="Resource" path="res://addons/danikakes.spatial_audio/presets/gravel.tres" id="5_i7lhh"]
-[ext_resource type="Resource" path="res://addons/danikakes.spatial_audio/presets/wood.tres" id="6_5iubo"]
-[ext_resource type="Resource" uid="uid://dqpx0depr5ola" path="res://addons/danikakes.spatial_audio/presets/brick.tres" id="7_i7lhh"]
-[ext_resource type="Script" uid="uid://c0mett6hd45b3" path="res://addons/danikakes.spatial_audio/spatial_audio_player_3d.gd" id="9_51e3a"]
-[ext_resource type="AudioStream" uid="uid://dt0cyuh7ah244" path="res://addons/danikakes.spatial_audio/demo/sounds/alice_01_carroll.tres" id="9_y2ove"]
-[ext_resource type="Resource" uid="uid://bylkerx730qm1" path="res://addons/danikakes.spatial_audio/presets/generic.tres" id="10_5wf8t"]
-[ext_resource type="Texture2D" uid="uid://ctwy1l0ysfr61" path="res://addons/danikakes.spatial_audio/demo/addons/grid_blue_512x512.svg" id="11_jr574"]
-[ext_resource type="Texture2D" uid="uid://dhp380cm1f0gq" path="res://addons/danikakes.spatial_audio/demo/addons/grid_orange_512x512.svg" id="12_u5e01"]
-[ext_resource type="Texture2D" uid="uid://cjpkedhpsgv1a" path="res://addons/danikakes.spatial_audio/demo/addons/grid_black_512x512.svg" id="13_l8meh"]
-[ext_resource type="Texture2D" uid="uid://b1ra6nhfy2vy6" path="res://addons/danikakes.spatial_audio/demo/addons/grid_red_512x512.svg" id="14_v0alm"]
-[ext_resource type="Texture2D" uid="uid://imwc8glrpclk" path="res://addons/danikakes.spatial_audio/demo/models/scifi_button/textures/UV_switch_baseColor.png" id="15_agvfh"]
-[ext_resource type="Script" uid="uid://cbh6fapmfd8pd" path="res://addons/danikakes.spatial_audio/demo/button.gd" id="15_laky8"]
-[ext_resource type="Resource" path="res://addons/danikakes.spatial_audio/presets/concrete.tres" id="15_u5e01"]
-[ext_resource type="Texture2D" uid="uid://b6ql7b07hl33m" path="res://addons/danikakes.spatial_audio/demo/models/scifi_button/textures/UV_switch_emissive.png" id="16_2bulj"]
-[ext_resource type="AudioStream" uid="uid://dyohk6qo6ohy7" path="res://addons/danikakes.spatial_audio/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (synthesizer).mp3" id="16_21ipk"]
-[ext_resource type="Texture2D" uid="uid://cpjobaqi6a57d" path="res://addons/danikakes.spatial_audio/demo/models/scifi_button/textures/UV_switch_metallicRoughness.png" id="17_laky8"]
-[ext_resource type="AudioStream" uid="uid://dybegd71exstr" path="res://addons/danikakes.spatial_audio/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (piano).mp3" id="17_ndc4l"]
-[ext_resource type="Texture2D" uid="uid://dk4q3w03yxu27" path="res://addons/danikakes.spatial_audio/demo/models/scifi_button/textures/UV_switch_normal.png" id="18_np5pn"]
-[ext_resource type="AudioStream" uid="uid://cc6isxicbwsap" path="res://addons/danikakes.spatial_audio/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (electric_guitar).mp3" id="18_p3jgd"]
-[ext_resource type="AudioStream" uid="uid://b2dudbaxp8v3b" path="res://addons/danikakes.spatial_audio/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (drum).mp3" id="19_jx30e"]
-[ext_resource type="AudioStream" uid="uid://cxgftr4lx8yho" path="res://addons/danikakes.spatial_audio/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (bass).mp3" id="20_agvfh"]
-[ext_resource type="AudioStream" uid="uid://urjovr5c43tu" path="res://addons/danikakes.spatial_audio/demo/sounds/SFX - Duck, Honk, 03.wav" id="20_np5pn"]
+[ext_resource type="PackedScene" uid="uid://cc1m2a1obsyn4" path="res://addons/demo/addons/fpc/character.tscn" id="1_1bmib"]
+[ext_resource type="Texture2D" uid="uid://hwl8uupfuba" path="res://addons/demo/addons/checker_white_512x512.svg" id="2_4f8ld"]
+[ext_resource type="PackedScene" uid="uid://doh7uwfugewuk" path="res://addons/demo/models/speaker.tscn" id="3_5iubo"]
+[ext_resource type="Script" uid="uid://cwwvs8e51jhep" path="res://addons/spatial_audio_player_3d.gd" id="9_51e3a"]
+[ext_resource type="AudioStream" uid="uid://dt0cyuh7ah244" path="res://addons/demo/sounds/alice_01_carroll.tres" id="9_y2ove"]
+[ext_resource type="Texture2D" uid="uid://dgokvedaggody" path="res://addons/demo/addons/grid_blue_512x512.svg" id="11_jr574"]
+[ext_resource type="Texture2D" uid="uid://xmc4oudtpu8q" path="res://addons/demo/addons/grid_orange_512x512.svg" id="12_u5e01"]
+[ext_resource type="Texture2D" uid="uid://co0wmocwc66wh" path="res://addons/demo/addons/grid_black_512x512.svg" id="13_l8meh"]
+[ext_resource type="Texture2D" uid="uid://dhcka6km374u7" path="res://addons/demo/addons/grid_red_512x512.svg" id="14_v0alm"]
+[ext_resource type="Texture2D" uid="uid://bo7nqf6isknlq" path="res://addons/demo/models/scifi_button/textures/UV_switch_baseColor.png" id="15_agvfh"]
+[ext_resource type="Script" uid="uid://ba2nkxa7pt2rv" path="res://addons/demo/button.gd" id="15_laky8"]
+[ext_resource type="Texture2D" uid="uid://4t8ru20nr0h" path="res://addons/demo/models/scifi_button/textures/UV_switch_emissive.png" id="16_2bulj"]
+[ext_resource type="AudioStream" uid="uid://dfxro2m23le58" path="res://addons/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (synthesizer).mp3" id="16_21ipk"]
+[ext_resource type="Texture2D" uid="uid://lwc7lmo4y075" path="res://addons/demo/models/scifi_button/textures/UV_switch_metallicRoughness.png" id="17_laky8"]
+[ext_resource type="AudioStream" uid="uid://d3env40h2qrgs" path="res://addons/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (piano).mp3" id="17_ndc4l"]
+[ext_resource type="Texture2D" uid="uid://dduv8c56muo2f" path="res://addons/demo/models/scifi_button/textures/UV_switch_normal.png" id="18_np5pn"]
+[ext_resource type="AudioStream" uid="uid://dr6skmatwkxop" path="res://addons/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (electric_guitar).mp3" id="18_p3jgd"]
+[ext_resource type="AudioStream" uid="uid://b38bgr7j4720y" path="res://addons/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (drum).mp3" id="19_jx30e"]
+[ext_resource type="AudioStream" uid="uid://doq75hbnppcsl" path="res://addons/demo/sounds/Stems/tatamusic-jazz-jazz-music-485401.mp3 (bass).mp3" id="20_agvfh"]
+[ext_resource type="AudioStream" uid="uid://dxo6pllhcaqyc" path="res://addons/demo/sounds/SFX - Duck, Honk, 03.wav" id="20_np5pn"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_feadd"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -292,8 +285,6 @@ size = Vector3(31.7706, 12.214081, 10.048309)
 material = SubResource("StandardMaterial3D_dip55")
 
 [node name="AcousticBody" type="Node" parent="Room Size Absorption/Absorption Glass" unique_id=1018985167]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("4_op4yf")
 
 [node name="Label3D" type="Label3D" parent="Room Size Absorption/Absorption Glass" unique_id=2047265397]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.935793, 4.6654954, 0)
@@ -315,8 +306,6 @@ size = Vector3(31.7706, 12.214081, 10.048309)
 material = SubResource("StandardMaterial3D_dip55")
 
 [node name="AcousticBody" type="Node" parent="Room Size Absorption/Absorption Gravel" unique_id=993639956]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("5_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Room Size Absorption/Absorption Gravel" unique_id=830252647]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.935793, 4.6654954, -0.28141785)
@@ -338,8 +327,6 @@ size = Vector3(31.7706, 12.214081, 10.048309)
 material = SubResource("StandardMaterial3D_dip55")
 
 [node name="AcousticBody" type="Node" parent="Room Size Absorption/Absorption Wood" unique_id=490188835]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("6_5iubo")
 
 [node name="Label3D" type="Label3D" parent="Room Size Absorption/Absorption Wood" unique_id=1555894253]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.935793, 4.6654954, 0.07256317)
@@ -361,8 +348,6 @@ size = Vector3(31.7706, 12.214081, 10.048309)
 material = SubResource("StandardMaterial3D_dip55")
 
 [node name="AcousticBody" type="Node" parent="Room Size Absorption/Absorption Brick" unique_id=386212247]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("7_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Room Size Absorption/Absorption Brick" unique_id=620226260]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -8.935793, 4.6654954, 0.19706726)
@@ -385,7 +370,6 @@ falloff_distance = 10.0
 attenuation_function = 4
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Occlusion Glass" type="CSGBox3D" parent="Material Occlusion" unique_id=1338065588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.82316, 1.8457794, 0.1442337)
@@ -394,8 +378,6 @@ use_collision = true
 size = Vector3(1, 6, 10)
 
 [node name="AcousticBody" type="Node" parent="Material Occlusion/Occlusion Glass" unique_id=569277254]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("4_op4yf")
 
 [node name="Label3D" type="Label3D" parent="Material Occlusion/Occlusion Glass" unique_id=445691272]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.1018982, 2.161592, 0)
@@ -408,8 +390,6 @@ use_collision = true
 size = Vector3(1, 6, 10)
 
 [node name="AcousticBody" type="Node" parent="Material Occlusion/Occlusion Wood" unique_id=2093073091]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("6_5iubo")
 
 [node name="Label3D" type="Label3D" parent="Material Occlusion/Occlusion Wood" unique_id=358737635]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.5648403, 2.161592, 0)
@@ -423,8 +403,6 @@ use_collision = true
 size = Vector3(1, 6, 10)
 
 [node name="AcousticBody" type="Node" parent="Material Occlusion/Occlusion Gravel" unique_id=106370062]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("5_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Material Occlusion/Occlusion Gravel" unique_id=1237210144]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.9180298, 2.161592, 0)
@@ -438,8 +416,6 @@ use_collision = true
 size = Vector3(1, 6, 10)
 
 [node name="AcousticBody" type="Node" parent="Material Occlusion/Occlusion Brick" unique_id=1013683508]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("7_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Material Occlusion/Occlusion Brick" unique_id=1429041728]
 transform = Transform3D(-4.5695582e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.5695582e-08, -1.249939, 2.161592, 0)
@@ -473,7 +449,6 @@ falloff_distance = 30.0
 attenuation_function = 4
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Occlusion Glass" type="CSGBox3D" parent="Occlusion Layering" unique_id=1953167790]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1.4203224, 1.8457794, 3.6442337)
@@ -482,8 +457,6 @@ use_collision = true
 size = Vector3(1, 6, 3)
 
 [node name="AcousticBody" type="Node" parent="Occlusion Layering/Occlusion Glass" unique_id=690717755]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("4_op4yf")
 
 [node name="Label3D" type="Label3D" parent="Occlusion Layering/Occlusion Glass" unique_id=90837439]
 transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, -1.1018982, 2.161592, 0.84030914)
@@ -496,8 +469,6 @@ use_collision = true
 size = Vector3(1, 6, 11)
 
 [node name="AcousticBody" type="Node" parent="Occlusion Layering/Occlusion Wood" unique_id=2117693427]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("6_5iubo")
 
 [node name="Label3D" type="Label3D" parent="Occlusion Layering/Occlusion Wood" unique_id=1636816497]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.5648422, 2.161592, -4)
@@ -511,8 +482,6 @@ use_collision = true
 size = Vector3(1, 6, 8)
 
 [node name="AcousticBody" type="Node" parent="Occlusion Layering/Occlusion Gravel" unique_id=110498640]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("5_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Occlusion Layering/Occlusion Gravel" unique_id=1452353632]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0.9180298, 2.161592, -2.4011688)
@@ -526,8 +495,6 @@ use_collision = true
 size = Vector3(1, 6, 5.257324)
 
 [node name="AcousticBody" type="Node" parent="Occlusion Layering/Occlusion Brick" unique_id=1756458589]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("7_i7lhh")
 
 [node name="Label3D" type="Label3D" parent="Occlusion Layering/Occlusion Brick" unique_id=1765112477]
 transform = Transform3D(-4.569558e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.569558e-08, -1.249939, 2.161592, 1.4377594)
@@ -641,7 +608,6 @@ enable_air_absorption = true
 enable_sound_delay = true
 speed_of_sound = 50.0
 debug_draw_playing_state = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker2" parent="Distance" unique_id=1120768999 instance=ExtResource("3_5iubo")]
 transform = Transform3D(0.0050265486, -2.50228e-08, -0.99998736, -0.710643, -0.70354366, -0.0035721068, -0.70353484, 0.71065193, -0.003536412, 2.4083161, 33.121456, -35.890842)
@@ -657,7 +623,6 @@ enable_air_absorption = true
 enable_sound_delay = true
 speed_of_sound = 50.0
 debug_draw_playing_state = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker3" parent="Distance" unique_id=887381498 instance=ExtResource("3_5iubo")]
 transform = Transform3D(0.005026548, -2.5022814e-08, -0.99998736, -0.710643, -0.70354366, -0.0035721068, -0.70353484, 0.71065193, -0.003536412, 2.4083197, 79.761734, -63.106857)
@@ -673,7 +638,6 @@ enable_air_absorption = true
 enable_sound_delay = true
 speed_of_sound = 50.0
 debug_draw_playing_state = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Label3D" type="Label3D" parent="Distance" unique_id=411414648]
 transform = Transform3D(1, 6.832283e-11, -3.4565963e-09, 6.8365605e-11, 0.9992179, 0.039538853, 3.4565963e-09, -0.039538853, 0.9992179, 1.5536718, -4.0584793, 6.303314)
@@ -752,8 +716,6 @@ size = Vector3(3.0609832, 5.4744644, 2.1694622)
 material = SubResource("StandardMaterial3D_4f8ld")
 
 [node name="AcousticBody" type="Node" parent="Room Size Reverb/Large Box" unique_id=695644992]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("6_5iubo")
 
 [node name="Speaker" parent="Room Size Reverb/Large Box" unique_id=1587440731 instance=ExtResource("3_5iubo")]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0.44454193, 0.33978462, -4.42807)
@@ -772,7 +734,6 @@ falloff_distance = 25.0
 attenuation_function = 4
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Auditorium" type="Node3D" parent="Room Size Reverb" unique_id=2069073281]
 transform = Transform3D(0.0050264834, 0, 0.99998736, 0, 1, 0, -0.99998736, 0, 0.0050264834, -93.22609, -3.8146973e-06, 71.49806)
@@ -798,8 +759,6 @@ size = Vector3(1.0230476, 4.7915907, 2.085711)
 material = SubResource("StandardMaterial3D_v0alm")
 
 [node name="AcousticBody" type="Node" parent="Room Size Reverb/Auditorium/Auditorium" unique_id=578358080]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("15_u5e01")
 
 [node name="CSGCombiner3D" type="CSGCombiner3D" parent="Room Size Reverb/Auditorium" unique_id=1981866442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 135.76175, 0, -24.768888)
@@ -835,8 +794,6 @@ size = Vector3(33.10492, 4.9831543, 9.00354)
 material = SubResource("StandardMaterial3D_v0alm")
 
 [node name="AcousticBody" type="Node" parent="Room Size Reverb/Auditorium/CSGCombiner3D" unique_id=2001104552]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("15_u5e01")
 
 [node name="CSGCombiner3D2" type="CSGCombiner3D" parent="Room Size Reverb/Auditorium" unique_id=2038745450]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 135.76175, 0, 8.989278)
@@ -866,8 +823,6 @@ size = Vector3(33.10492, 4.9831543, 9.00354)
 material = SubResource("StandardMaterial3D_v0alm")
 
 [node name="AcousticBody" type="Node" parent="Room Size Reverb/Auditorium/CSGCombiner3D2" unique_id=500404380]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("15_u5e01")
 
 [node name="CSGBox3D9" type="CSGBox3D" parent="Room Size Reverb/Auditorium/CSGCombiner3D2" unique_id=1187170530]
 transform = Transform3D(0.7508668, -0.13814853, -5.5088734e-10, 0.13814853, 0.7508668, 6.0386665e-09, -5.5090155e-10, -6.038667e-09, 0.76346993, -137.77008, 2.7248387, 11.064114)
@@ -890,7 +845,6 @@ attenuation_function = 4
 inner_radius_panning_strength = 2.0
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker2" parent="Room Size Reverb/Auditorium" unique_id=995390485 instance=ExtResource("3_5iubo")]
 transform = Transform3D(-8.742278e-08, 1, -4.3711385e-08, -1, -8.742278e-08, 3.5527137e-15, -2.6865725e-16, 4.371139e-08, 1, -34.10927, 3.594841, -5.3940125)
@@ -907,7 +861,6 @@ attenuation_function = 4
 inner_radius_panning_strength = 2.0
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker3" parent="Room Size Reverb/Auditorium" unique_id=1228048306 instance=ExtResource("3_5iubo")]
 transform = Transform3D(-8.742278e-08, 1, -4.3711385e-08, -1, -8.742278e-08, 3.5527137e-15, -2.6865725e-16, 4.371139e-08, 1, -29.304781, 3.594841, -0.7059517)
@@ -924,7 +877,6 @@ attenuation_function = 4
 inner_radius_panning_strength = 2.0
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker4" parent="Room Size Reverb/Auditorium" unique_id=896955947 instance=ExtResource("3_5iubo")]
 transform = Transform3D(-8.742278e-08, 1, -4.3711385e-08, -1, -8.742278e-08, 3.5527137e-15, -2.6865725e-16, 4.371139e-08, 1, -29.463642, 3.594841, 12.326328)
@@ -942,7 +894,6 @@ inner_radius_panning_strength = 2.0
 enable_air_absorption = true
 enable_sound_delay = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Speaker5" parent="Room Size Reverb/Auditorium" unique_id=539218768 instance=ExtResource("3_5iubo")]
 transform = Transform3D(-8.742278e-08, 1, -4.3711385e-08, -1, -8.742278e-08, 3.5527137e-15, -2.6865725e-16, 4.371139e-08, 1, -27.020817, 3.594841, 5.5450516)
@@ -959,7 +910,6 @@ attenuation_function = 4
 inner_radius_panning_strength = 2.0
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="Medum Box" type="CSGCombiner3D" parent="Room Size Reverb" unique_id=1642362698]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -53.91667, 3.1474543, 1.886158)
@@ -999,8 +949,5 @@ falloff_distance = 10.0
 attenuation_function = 4
 enable_air_absorption = true
 display_debug_info = true
-metadata/_custom_type_script = "uid://c0mett6hd45b3"
 
 [node name="AcousticBody" type="Node" parent="Room Size Reverb/Medum Box" unique_id=269904794]
-script = ExtResource("3_4f8ld")
-acoustic_material = ExtResource("10_5wf8t")

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://doh7uwfugewuk"]
 
-[ext_resource type="PackedScene" uid="uid://cmjxs7qt24ykl" path="res://addons/danikakes.spatial_audio/demo/models/generic_speaker.glb" id="1_lyc4c"]
+[ext_resource type="PackedScene" uid="uid://qdaew073mrd" path="res://demo/models/generic_speaker.glb" id="1_lyc4c"]
+
 
 [node name="Speaker" unique_id=776548048 instance=ExtResource("1_lyc4c")]
 
