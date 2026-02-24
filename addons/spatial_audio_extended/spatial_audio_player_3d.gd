@@ -119,7 +119,7 @@ var _last_wall_absorptions: Array = []
 			_rebuild_raycasts()
 
 ## The collision-shape (or any Node3D) used as the scattering origin. Rays
-## will be positioned around this node and fired outward. Optional — if
+## will be positioned around this node and fired outward. If
 ## empty, rays will be scattered around this node's global origin.
 @export var scatter_shape : Node3D = null :
 	set(value):
@@ -359,7 +359,10 @@ var _last_wall_absorptions: Array = []
 ## When true and the node's `autoplay` is enabled, the player will start at
 ## `minimum_volume_db` on ready and lerp up once the first geometry scan
 ## completes. Toggle this to disable the automatic silent startup for autoplay.
-@export var autoplay_fade_in := true
+@export var autoplay_fade_in := true :
+	set(value):
+		autoplay_fade_in = value
+		notify_property_list_changed()
 
 ## Speed used specifically for fading the volume in when `autoplay_fade_in`
 ## is active. Separate from `lerp_speed` so effect parameters can remain
@@ -410,7 +413,10 @@ var _last_wall_absorptions: Array = []
 ## update cycle while within the radius of the source.
 ## [br]Displays: listener distance, occlusion state, lowpass cutoff, reverb
 ## room size / wetness, volume, and per-ray distances.
-@export var display_debug_info := false
+@export var display_debug_info := false :
+	set(value):
+		display_debug_info = value
+		notify_property_list_changed()
 
 ## While the debug overlay is visible, press this key to toggle all
 ## spatial-audio effects on/off so you can A/B compare the difference.
@@ -519,6 +525,10 @@ var _debug_immediate : ImmediateMesh = null
 var _debug_instance : MeshInstance3D = null
 
 var _base_volume_db : float = 0.0
+## External volume offset (dB) injected by routing/reflection systems.
+var _external_volume_db_offset : float = 0.0
+## External occlusion hold-until time (msec). While active, occlusion is forced open.
+var _external_occlusion_hold_until_msec : int = 0
 
 var _debug_panel : PanelContainer = null
 var _debug_minimized := false
@@ -530,10 +540,16 @@ var _debug_rays_label : RichTextLabel = null
 var _debug_rays_scroll : ScrollContainer = null
 var _debug_rays_toggle : Button = null
 var _debug_rays_expanded := false
+var _debug_navigation_label : RichTextLabel = null
+var _debug_navigation_scroll : ScrollContainer = null
+var _debug_navigation_toggle : Button = null
+var _debug_navigation_expanded := false
 var _debug_connector_line : Line2D = null
 var _debug_occl_abs_weight: float = 0.0
 ## Per-ray expansion state for reflection dropdowns in debug overlay.
 var _debug_ray_reflections_expanded = {}  # int index -> bool
+var _external_navigation_debug_active: bool = false
+var _external_navigation_debug: Dictionary = {}
 
 static var global_effects_disabled : bool = false
 
@@ -552,11 +568,59 @@ var _effects_enabled_value : bool = true
 
 static func set_global_effects_disabled(disabled: bool) -> void:
 	SpatialAudioPlayer3D.global_effects_disabled = disabled
+
+
+func set_external_volume_db_offset(offset_db: float) -> void:
+	## Allows external systems (e.g. reflection routing) to apply extra
+	## loudness loss without fighting this class's internal attenuation.
+	_external_volume_db_offset = offset_db
+
+
+func get_external_volume_db_offset() -> float:
+	return _external_volume_db_offset
+
+
+func clear_external_volume_db_offset() -> void:
+	_external_volume_db_offset = 0.0
+
+
+func _apply_external_volume_offset(volume_db_value: float) -> float:
+	return maxf(volume_db_value + _external_volume_db_offset, minimum_volume_db)
+
+
+func set_external_occlusion_hold(seconds: float) -> void:
+	## Temporarily forces occlusion open. Intended for proxy-transition smoothing.
+	var duration_ms := int(maxf(seconds, 0.0) * 1000.0)
+	if duration_ms <= 0:
+		return
+	var until := Time.get_ticks_msec() + duration_ms
+	_external_occlusion_hold_until_msec = maxi(_external_occlusion_hold_until_msec, until)
+
+
+func clear_external_occlusion_hold() -> void:
+	_external_occlusion_hold_until_msec = 0
+
+
+func is_external_occlusion_held() -> bool:
+	return Time.get_ticks_msec() < _external_occlusion_hold_until_msec
+
+
+func set_external_navigation_debug_data(active: bool, info: Dictionary = {}) -> void:
+	## Injects navigation/proxy diagnostics from an external routing agent.
+	_external_navigation_debug_active = active
+	_external_navigation_debug = info.duplicate(true) if active else {}
+	_refresh_navigation_debug_visibility()
+
+
+func clear_external_navigation_debug_data() -> void:
+	_external_navigation_debug_active = false
+	_external_navigation_debug.clear()
+	_refresh_navigation_debug_visibility()
 #endregion
 
 #region SOUND SPEED DELAY
 
-## Deisgned as an override for [method AudioStreamPlayer3D.play] to optionally delay playback
+## Deisgned as an override for [method AudioStreamPlayer3D.play] to delay playback
 ## based on the listener's distance and [param speed_of_sound].
 func play_with_delay(from_position: float = 0.0) -> void:
 	# Track initiation time for the debug playing-state sphere.
@@ -659,6 +723,14 @@ func _validate_property(property: Dictionary) -> void:
 
 	# Hide Sound Speed Delay children when disabled
 	if not enable_sound_delay and property.name == "speed_of_sound":
+		property.usage &= ~PROPERTY_USAGE_EDITOR
+
+	# Hide autoplay fade speed when autoplay fade-in is disabled
+	if not autoplay_fade_in and property.name == "autoplay_fade_in_speed":
+		property.usage &= ~PROPERTY_USAGE_EDITOR
+
+	# Hide debug keybinds when debug overlay display is disabled
+	if not display_debug_info and property.name in ["debug_toggle_effects_key", "debug_toggle_shapes_key"]:
 		property.usage &= ~PROPERTY_USAGE_EDITOR
 
 
@@ -1052,7 +1124,7 @@ func _on_spatial_audio_update(listener: Node3D) -> void:
 
 func _update_volume_attenuation(listener: Node3D) -> void:
 	if not enable_volume_attenuation:
-		_target_volume_db = _base_volume_db
+		_target_volume_db = _apply_external_volume_offset(_base_volume_db)
 		return
 
 	var dist := listener.global_position.distance_to(global_position)
@@ -1088,11 +1160,11 @@ func _update_volume_attenuation(listener: Node3D) -> void:
 	_was_audible = audible
 
 	if inside_inner:
-		_target_volume_db = _base_volume_db
+		_target_volume_db = _apply_external_volume_offset(_base_volume_db)
 		return
 
 	if dist >= outer_radius:
-		_target_volume_db = minimum_volume_db
+		_target_volume_db = _apply_external_volume_offset(minimum_volume_db)
 		return
 
 	# Normalised distance within the falloff zone (0 = inner edge, 1 = outer edge).
@@ -1103,7 +1175,7 @@ func _update_volume_attenuation(listener: Node3D) -> void:
 	var base_gain := pow(10.0, _base_volume_db / 20.0)
 	var gain := lerp(min_gain, base_gain, att)
 	gain = max(gain, 1e-8)
-	_target_volume_db = 20.0 * log(gain) / log(10.0)
+	_target_volume_db = _apply_external_volume_offset(20.0 * log(gain) / log(10.0))
 
 
 func _update_panning_strength(listener: Node3D) -> void:
@@ -1324,7 +1396,7 @@ func _update_reverb() -> void:
 	var openness_sum := 0.0
 
 	for i in range(omni_count):
-		# Optionally skip rays pointing at the floor.
+		# Skip rays pointing at the floor when floor ignore is enabled.
 		if ignore_floor and i < _ray_directions.size():
 			if _ray_directions[i].y <= -floor_cos_threshold:
 				continue
@@ -1414,6 +1486,17 @@ func _update_reverb() -> void:
 func _update_lowpass(listener: Node3D) -> void:
 	if _lowpass_filter == null or not audio_occlusion:
 		_target_lowpass_cutoff = float(open_lowpass_cutoff)
+		return
+
+	if is_external_occlusion_held():
+		var prev_wall_count := _last_wall_count
+		_target_lowpass_cutoff = float(open_lowpass_cutoff)
+		_last_wall_count = 0
+		_last_wall_materials.clear()
+		_last_wall_absorptions.clear()
+		if prev_wall_count > 0:
+			emit_signal("occlusion_changed", 0, _target_lowpass_cutoff)
+			emit_signal("audio_unoccluded", listener)
 		return
 
 	if global_effects_disabled:
@@ -1743,6 +1826,38 @@ func _setup_debug_overlay() -> void:
 	_debug_rays_scroll.add_child(_debug_rays_label)
 	_debug_content_vbox.add_child(_debug_rays_scroll)
 
+	# Collapsible navigation/proxy diagnostics (only shown while in proxy mode).
+	_debug_navigation_toggle = Button.new()
+	_debug_navigation_toggle.name = "NavigationToggle"
+	_debug_navigation_toggle.text = "▶ Navigation"
+	_debug_navigation_toggle.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_debug_navigation_toggle.flat = true
+	_debug_navigation_toggle.visible = false
+	_debug_navigation_toggle.add_theme_color_override("font_color", Color.LIGHT_GRAY)
+	_debug_navigation_toggle.add_theme_color_override("font_hover_color", Color.WHITE)
+	_debug_navigation_toggle.add_theme_font_size_override("font_size", 13)
+	_debug_navigation_toggle.pressed.connect(_on_navigation_toggle_pressed)
+	_debug_content_vbox.add_child(_debug_navigation_toggle)
+
+	_debug_navigation_scroll = ScrollContainer.new()
+	_debug_navigation_scroll.name = "NavigationScroll"
+	_debug_navigation_scroll.custom_minimum_size = Vector2(420, 0)
+	_debug_navigation_scroll.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	_debug_navigation_scroll.visible = false
+
+	_debug_navigation_label = RichTextLabel.new()
+	_debug_navigation_label.name = "NavigationLabel"
+	_debug_navigation_label.bbcode_enabled = true
+	_debug_navigation_label.fit_content = true
+	_debug_navigation_label.custom_minimum_size = Vector2(420, 0)
+	_debug_navigation_label.scroll_active = false
+	_debug_navigation_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_debug_navigation_label.add_theme_font_size_override("normal_font_size", 13)
+	_debug_navigation_label.add_theme_color_override("default_color", Color.WHITE)
+
+	_debug_navigation_scroll.add_child(_debug_navigation_label)
+	_debug_content_vbox.add_child(_debug_navigation_scroll)
+
 	outer_vbox.add_child(_debug_content_vbox)
 	_debug_panel.add_child(outer_vbox)
 	_debug_shared_vbox.add_child(_debug_panel)
@@ -1758,6 +1873,7 @@ func _setup_debug_overlay() -> void:
 		get_viewport().add_child(_debug_connector_line)
 	else:
 		_debug_shared_layer.add_child(_debug_connector_line)
+	_refresh_navigation_debug_visibility()
 
 
 func _on_debug_minimize_toggled() -> void:
@@ -1779,6 +1895,56 @@ func _on_rays_toggle_pressed() -> void:
 		var omni_count := maxi(_ray_names.size() - 1, 0)
 		var arrow := "▼" if _debug_rays_expanded else "▶"
 		_debug_rays_toggle.text = "%s Rays (%d)" % [arrow, omni_count]
+
+
+func _on_navigation_toggle_pressed() -> void:
+	_debug_navigation_expanded = not _debug_navigation_expanded
+	_refresh_navigation_debug_visibility()
+
+
+func _refresh_navigation_debug_visibility() -> void:
+	if _debug_navigation_toggle == null or _debug_navigation_scroll == null:
+		return
+	var visible := _external_navigation_debug_active
+	_debug_navigation_toggle.visible = visible
+	_debug_navigation_scroll.visible = visible and _debug_navigation_expanded
+	if _debug_navigation_toggle.visible:
+		var arrow := "▼" if _debug_navigation_expanded else "▶"
+		_debug_navigation_toggle.text = "%s Navigation" % arrow
+
+
+func _format_navigation_debug_text() -> String:
+	if not _external_navigation_debug_active:
+		return ""
+	var d := _external_navigation_debug
+	var profile := str(d.get("profile", ""))
+	var node_name := str(d.get("agent_name", ""))
+	var path_points := int(d.get("path_points", 0))
+	var graph_points := int(d.get("graph_points", 0))
+	var graph_edges := int(d.get("graph_edges", 0))
+	var path_len := float(d.get("path_length", 0.0))
+	var direct_len := float(d.get("direct_distance", 0.0))
+	var detour_ratio := float(d.get("detour_ratio", 1.0))
+	var proxy_to_listener := float(d.get("proxy_to_listener", 0.0))
+	var proxy_to_origin := float(d.get("proxy_to_origin", 0.0))
+	var target_delta := float(d.get("proxy_to_target", 0.0))
+	var in_backoff := bool(d.get("proxy_backoff_active", false))
+	var spring_active := bool(d.get("spring_arm_active", false))
+	var spring_from_end := float(d.get("spring_arm_distance_from_end", 0.0))
+	var waypoint_idx := int(d.get("proxy_waypoint_index", 0))
+	var update_hz := float(d.get("update_hz", 0.0))
+
+	var txt := ""
+	txt += "Agent           [color=white]%s[/color]\n" % node_name
+	txt += "Profile         [color=yellow]%s[/color]\n" % profile
+	txt += "Path            [color=yellow]%d pts[/color]  len: %.2f m  direct: %.2f m  ratio: %.2f\n" % [path_points, path_len, direct_len, detour_ratio]
+	txt += "Graph           [color=yellow]%d pts[/color]  %d edges\n" % [graph_points, graph_edges]
+	txt += "Proxy           waypoint: %d  to listener: %.2f m  to origin: %.2f m\n" % [waypoint_idx, proxy_to_listener, proxy_to_origin]
+	txt += "Proxy target    delta: %.2f m  backoff: %s  spring: %s\n" % [target_delta, "ON" if in_backoff else "OFF", "ON" if spring_active else "OFF"]
+	if spring_active:
+		txt += "Spring dist     %.2f m from path end\n" % spring_from_end
+	txt += "Solve rate      %.2f Hz\n" % update_hz
+	return txt
 
 
 func _on_ray_meta_clicked(meta: Variant) -> void:
@@ -1805,7 +1971,10 @@ func _print_debug(listener: Node3D) -> void:
 		"reverb_wetness": _target_reverb_wetness,
 		"reverb_damping": _target_reverb_damping,
 		"wall_count": _last_wall_count,
+		"navigation_proxy_active": _external_navigation_debug_active,
 	}
+	if _external_navigation_debug_active:
+		info["navigation"] = _external_navigation_debug
 	emit_signal("spatial_audio_debug", info)
 
 	var effective_max_dist := max_distance if max_distance > 0.0 else max_raycast_distance
@@ -1917,6 +2086,11 @@ func _print_debug(listener: Node3D) -> void:
 	]
 
 	_debug_overlay_label.text = t
+	_refresh_navigation_debug_visibility()
+	if _external_navigation_debug_active and _debug_navigation_label != null:
+		_debug_navigation_label.text = _format_navigation_debug_text()
+	elif _debug_navigation_label != null:
+		_debug_navigation_label.text = ""
 
 	# Update the toggle button text
 	if _debug_rays_toggle != null:
@@ -1991,6 +2165,13 @@ func _print_debug(listener: Node3D) -> void:
 			var max_scroll_h := 200.0
 			_debug_rays_scroll.custom_minimum_size.y = minf(content_h, max_scroll_h)
 			_debug_rays_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if content_h > max_scroll_h else ScrollContainer.SCROLL_MODE_DISABLED
+	if _external_navigation_debug_active and _debug_navigation_expanded and _debug_navigation_label != null and _debug_navigation_scroll != null:
+		await get_tree().process_frame
+		if _debug_navigation_label != null and _debug_navigation_scroll != null:
+			var nav_h := _debug_navigation_label.get_combined_minimum_size().y
+			var max_nav_h := 160.0
+			_debug_navigation_scroll.custom_minimum_size.y = minf(nav_h, max_nav_h)
+			_debug_navigation_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if nav_h > max_nav_h else ScrollContainer.SCROLL_MODE_DISABLED
 #endregion
 
 #region DEBUG DRAWING

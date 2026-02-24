@@ -16,6 +16,7 @@ An advanced, drop-in replacement for Godot's `AudioStreamPlayer3D` that adds phy
 - **Acoustic Materials** — Physics-based surface properties (absorption, scattering, transmission) with 11 built-in presets covering brick, concrete, carpet, glass, wood, metal, and more.
 - **Debug Overlay** — On-screen HUD, in-editor ray visualisation, radius wireframes, and a live A/B effect toggle.
 - **Rich Signals** — Zone transitions, occlusion events, reverb updates, air absorption changes, playback state, and diagnostic data.
+- **Reflection Navigation Agent (Experimental)** — `SpatialReflectionNavigationAgent3D` routes reflected proxy audio around corners in 3D space and integrates with `SpatialAudioPlayer3D`.
 
 ---
 
@@ -61,6 +62,7 @@ The plugin adds an **"Add AcousticBody"** button to the Inspector when a `Collis
 | Node | Description |
 |---|---|
 | `SpatialAudioPlayer3D` | The main audio player. Drop-in for `AudioStreamPlayer3D`. |
+| `SpatialReflectionNavigationAgent3D` | 3D path-routing agent for reflected/proxy audio around occluders. |
 | `AcousticBody` | Attach to collision geometry to define its acoustic surface properties. |
 | `AcousticMaterial` | Resource defining absorption, scattering, and transmission per frequency band. |
 
@@ -121,6 +123,32 @@ SpatialAudioPlayer3D.set_global_effects_disabled(true)
 
 ---
 
+## Spatial Reflection Navigation Agent (Experimental)
+
+Use `SpatialReflectionNavigationAgent3D` to move a proxied `SpatialAudioPlayer3D` along a collision-aware path between a source origin and the active camera. This allows audio to route around corners instead of leaking directly through walls.
+
+### Quick Setup
+
+1. Add `SpatialReflectionNavigationAgent3D` to your scene at the source location.
+2. Add a `SpatialAudioPlayer3D` as a child of the agent (or assign it via `audio_player_node`).
+3. Enable `move_audio_player`.
+4. Select a `navigation_profile`:
+   - `OPEN_AREAS` for open spaces.
+   - `HALLWAYS` for tight interior corridors.
+   - `CUSTOM` for manual tuning.
+5. Enable debug toggles to inspect bounds/path in runtime. In editor, bounds/path preview can be shown while selected.
+
+### Notable Capabilities
+
+- 3D graph pathing (not limited to flat ground).
+- Profile-driven tuning plus custom manual controls.
+- Proxy spring-arm/backoff to keep reflected proxy away from the listener.
+- Reflection volume-loss integration with `SpatialAudioPlayer3D`.
+- Proxy-only navigation diagnostics in the `SpatialAudioPlayer3D` debug overlay.
+- Inspector warnings when no `SpatialAudioPlayer3D` is available, or when a regular `AudioStreamPlayer3D` is used.
+
+---
+
 ## Documentation
 
 Full documentation is available in the [Wiki](../../wiki):
@@ -128,6 +156,7 @@ Full documentation is available in the [Wiki](../../wiki):
 - [Installation](../../wiki/Installation)
 - [Getting Started](../../wiki/Getting-Started)
 - [SpatialAudioPlayer3D Reference](../../wiki/SpatialAudioPlayer3D-Reference)
+- [SpatialReflectionNavigationAgent3D Reference](../../wiki/SpatialReflectionNavigationAgent3D-Reference)
 - [AcousticBody Reference](../../wiki/AcousticBody-Reference)
 - [AcousticMaterial Reference](../../wiki/AcousticMaterial-Reference)
 - [Material Presets](../../wiki/Material-Presets)
