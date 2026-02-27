@@ -789,7 +789,7 @@ func _ready() -> void:
 	_last_air_absorption_cutoff = _target_air_absorption_cutoff
 
 	# Set EditorInterface safely
-	if Engine.has_singleton("EditorInterface"):
+	if Engine.is_editor_hint() and Engine.has_singleton("EditorInterface"):
 		_editor_interface = Engine.get_singleton("EditorInterface")
 
 
