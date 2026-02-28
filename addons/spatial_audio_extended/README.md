@@ -13,7 +13,7 @@ An advanced, drop-in replacement for Godot's `AudioStreamPlayer3D` that adds phy
 - **Wall Occlusion** — Multi-wall detection with material-based lowpass filtering and volume reduction. Sounds become progressively more muffled behind each wall.
 - **Air Absorption** — Distance-based high-frequency rolloff simulating how air attenuates sound over long distances.
 - **Sound Speed Delay** — Realistic propagation delay for one-shot sounds. Fire a gunshot across a valley and hear it arrive a moment later.
-- **Acoustic Materials** — Physics-based surface properties (absorption, scattering, transmission) with 11 built-in presets covering brick, concrete, carpet, glass, wood, metal, and more.
+- **Acoustic Materials** — Physics-based surface properties (absorption, scattering, transmission) with 12 built-in presets covering brick, concrete, carpet, glass, wood, metal, acoustic foam, and more.
 - **Debug Overlay** — On-screen HUD, in-editor ray visualisation, radius wireframes, and a live A/B effect toggle.
 - **Rich Signals** — Zone transitions, occlusion events, reverb updates, air absorption changes, playback state, and diagnostic data.
 - **Reflection Navigation Agent (Experimental)** — `SpatialReflectionNavigationAgent3D` routes reflected proxy audio around corners in 3D space and integrates with `SpatialAudioPlayer3D`.
@@ -70,9 +70,9 @@ The plugin adds an **"Add AcousticBody"** button to the Inspector when a `Collis
 
 ## Acoustic Material Presets
 
-11 presets are included, based on real-world acoustic data:
+12 presets are included, based on real-world acoustic data:
 
-`brick` · `concrete` · `ceramic` · `carpet` · `glass` · `gravel` · `metal` · `plaster` · `rock` · `wood` · `generic`
+`brick` · `concrete` · `ceramic` · `carpet` · `glass` · `gravel` · `metal` · `plaster` · `rock` · `wood` · `generic` · `acoustic_foam`
 
 ```gdscript
 # Load from disk

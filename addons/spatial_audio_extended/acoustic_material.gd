@@ -16,6 +16,9 @@ class_name AcousticMaterial
 ## [br]  • [b]Low[/b]  ≤ 400 Hz
 ## [br]  • [b]Mid[/b]  400 – 2 500 Hz
 ## [br]  • [b]High[/b] ≥ 2 500 Hz
+## [br][b]Total Absorption[/b] — when enabled, this surface behaves as
+## soundproof in occlusion (fully blocks direct sound) and strongly suppresses
+## reverb wetness.
 
 #region EXPORTS (editable properties)
 
@@ -40,6 +43,13 @@ class_name AcousticMaterial
 @export_range(0.0, 1.0, 0.001) var transmission_mid : float = 0.050
 ## Fraction of high-frequency energy that passes through (≥ 2 500 Hz).
 @export_range(0.0, 1.0, 0.001) var transmission_high : float = 0.030
+
+@export_group("Special")
+## Treat this material as soundproof for direct-path occlusion and reverb.
+@export var total_absorption : bool = false
+## Fade speed used when entering/leaving total-absorption occlusion.
+## Lower values make soundproof transitions less abrupt.
+@export_range(0.1, 20.0, 0.1) var total_absorption_transition_speed : float = 2.5
 
 #endregion
 
@@ -120,5 +130,14 @@ static func preset_rock() -> AcousticMaterial:
 	m.absorption_low = 0.13; m.absorption_mid = 0.20; m.absorption_high = 0.24
 	m.scattering = 0.20
 	m.transmission_low = 0.015; m.transmission_mid = 0.002; m.transmission_high = 0.001
+	return m
+
+static func preset_acoustic_foam() -> AcousticMaterial:
+	var m := AcousticMaterial.new()
+	m.absorption_low = 1.00; m.absorption_mid = 1.00; m.absorption_high = 1.00
+	m.scattering = 0.60
+	m.transmission_low = 0.000; m.transmission_mid = 0.000; m.transmission_high = 0.000
+	m.total_absorption = true
+	m.total_absorption_transition_speed = 1.2
 	return m
 #endregion
