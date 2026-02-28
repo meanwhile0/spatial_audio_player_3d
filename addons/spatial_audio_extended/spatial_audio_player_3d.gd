@@ -450,10 +450,22 @@ var _reflection_escaped : Array[bool] = []
 ## the entire path.  Escaped rays store -1.0 (ignored in averaging).
 var _ray_absorptions : Array[float] = []
 
+## Per-ray flag: true when the ray hit any total-absorption (soundproof) material.
+var _ray_total_absorption : Array[bool] = []
+## Per-ray transition speed for total-absorption materials.
+var _ray_total_absorption_transition_speeds : Array[float] = []
+
 ## Material name of the surface each omni ray first hit (for debug display).
 var _ray_material_names : Array[String] = []
 
 var _target_raycast : RayCast3D = null
+
+const _TOTAL_ABSORPTION_REVERB_WETNESS_CAP := 0.05
+const _TOTAL_ABSORPTION_REVERB_DAMPING_FLOOR := 0.90
+const _TOTAL_ABSORPTION_LOWPASS_HZ := 20.0
+const _TOTAL_ABSORPTION_MUTE_DB := -120.0
+const _TOTAL_ABSORPTION_TRANSITION_THRESHOLD_DB := -100.0
+const _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED := 2.5
 
 ## Classic omni ray definitions: direction + rotation_degrees.
 const _CLASSIC_RAYS := {
@@ -529,6 +541,9 @@ var _base_volume_db : float = 0.0
 var _external_volume_db_offset : float = 0.0
 ## External occlusion hold-until time (msec). While active, occlusion is forced open.
 var _external_occlusion_hold_until_msec : int = 0
+## Hard-mute the emitter while a total-absorption wall blocks the direct path.
+var _hard_muted_by_total_absorption : bool = false
+var _active_total_absorption_transition_speed : float = _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED
 
 var _debug_panel : PanelContainer = null
 var _debug_minimized := false
@@ -807,6 +822,8 @@ func _rebuild_raycasts() -> void:
 	_reflection_paths.clear()
 	_reflection_escaped.clear()
 	_ray_absorptions.clear()
+	_ray_total_absorption.clear()
+	_ray_total_absorption_transition_speeds.clear()
 	_ray_material_names.clear()
 	_target_raycast = null
 
@@ -830,6 +847,8 @@ func _rebuild_raycasts() -> void:
 			_reflection_paths.append([])
 			_reflection_escaped.append(false)
 			_ray_absorptions.append(0.0)
+			_ray_total_absorption.append(false)
+			_ray_total_absorption_transition_speeds.append(_DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED)
 			_ray_material_names.append("")
 			add_child(r, false, Node.INTERNAL_MODE_FRONT)
 	elif ray_distribution == RayDistribution.FIBONACCI_SPHERE:
@@ -848,6 +867,8 @@ func _rebuild_raycasts() -> void:
 			_reflection_paths.append([])
 			_reflection_escaped.append(false)
 			_ray_absorptions.append(0.0)
+			_ray_total_absorption.append(false)
+			_ray_total_absorption_transition_speeds.append(_DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED)
 			_ray_material_names.append("")
 			add_child(r, false, Node.INTERNAL_MODE_FRONT)
 	elif ray_distribution == RayDistribution.SHAPE_SCATTER:
@@ -881,6 +902,8 @@ func _rebuild_raycasts() -> void:
 			_reflection_paths.append([])
 			_reflection_escaped.append(false)
 			_ray_absorptions.append(0.0)
+			_ray_total_absorption.append(false)
+			_ray_total_absorption_transition_speeds.append(_DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED)
 			_ray_material_names.append("")
 			add_child(r, false, Node.INTERNAL_MODE_FRONT)
 			# Place the ray at the computed world origin and set its target.
@@ -904,6 +927,8 @@ func _rebuild_raycasts() -> void:
 	_reflection_paths.append([])
 	_reflection_escaped.append(false)
 	_ray_absorptions.append(0.0)
+	_ray_total_absorption.append(false)
+	_ray_total_absorption_transition_speeds.append(_DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED)
 	_ray_material_names.append("")
 	add_child(target_r, false, Node.INTERNAL_MODE_FRONT)
 
@@ -1050,12 +1075,20 @@ static func _random_unit_vector() -> Vector3:
 
 func _lerp_parameters(delta: float) -> void:
 	var t := clampf(delta * lerp_speed, 0.0, 1.0)
+	var t_total_absorption := clampf(delta * _active_total_absorption_transition_speed, 0.0, 1.0)
+	var total_absorption_transitioning := (
+		_hard_muted_by_total_absorption
+		or _target_volume_db <= _TOTAL_ABSORPTION_TRANSITION_THRESHOLD_DB
+		or volume_db <= _TOTAL_ABSORPTION_TRANSITION_THRESHOLD_DB
+	)
 
 	# Use a dedicated speed for the autoplay volume fade when active so
 	# effect parameters can continue to use the general `lerp_speed`.
 	var t_volume := t
 	if _autoplay_fade_active:
 		t_volume = clampf(delta * autoplay_fade_in_speed, 0.0, 1.0)
+	elif total_absorption_transitioning:
+		t_volume = t_total_absorption
 
 	volume_db = lerpf(volume_db, _target_volume_db, t_volume)
 	panning_strength = lerpf(panning_strength, _target_panning_strength, t)
@@ -1066,10 +1099,13 @@ func _lerp_parameters(delta: float) -> void:
 		var combined_cutoff := minf(_target_lowpass_cutoff, _target_air_absorption_cutoff)
 		var cur_cut := maxf(1.0, float(_lowpass_filter.cutoff_hz))
 		var tgt_cut := maxf(1.0, combined_cutoff)
-		_lowpass_filter.cutoff_hz = exp(lerp(log(cur_cut), log(tgt_cut), t))
+		var t_filter := t_total_absorption if total_absorption_transitioning else t
+		_lowpass_filter.cutoff_hz = exp(lerp(log(cur_cut), log(tgt_cut), t_filter))
 
 	if _reverb_effect != null:
-		_reverb_effect.wet = lerp(_reverb_effect.wet, _target_reverb_wetness * max_reverb_wetness, t)
+		var target_wet := 0.0 if _hard_muted_by_total_absorption else _target_reverb_wetness * max_reverb_wetness
+		var t_reverb := t_total_absorption if total_absorption_transitioning else t
+		_reverb_effect.wet = lerp(_reverb_effect.wet, target_wet, t_reverb)
 		_reverb_effect.room_size = lerp(_reverb_effect.room_size, _target_reverb_room_size, t)
 		_reverb_effect.damping = lerp(_reverb_effect.damping, _target_reverb_damping, t)
 
@@ -1085,7 +1121,7 @@ func _lerp_parameters(delta: float) -> void:
 ## the smooth lerp. Used on the first frame to avoid audible unfiltered bleed.
 func _snap_parameters(snap_volume: bool = true) -> void:
 	if snap_volume:
-		volume_db = _target_volume_db
+		volume_db = _TOTAL_ABSORPTION_MUTE_DB if _hard_muted_by_total_absorption else _target_volume_db
 	# Always snap non-audible parameters to avoid artifacting.
 	panning_strength = _target_panning_strength
 
@@ -1094,7 +1130,7 @@ func _snap_parameters(snap_volume: bool = true) -> void:
 		_lowpass_filter.cutoff_hz = maxf(1.0, combined_cutoff)
 
 	if _reverb_effect != null:
-		_reverb_effect.wet = _target_reverb_wetness * max_reverb_wetness
+		_reverb_effect.wet = 0.0 if _hard_muted_by_total_absorption else _target_reverb_wetness * max_reverb_wetness
 		_reverb_effect.room_size = _target_reverb_room_size
 		_reverb_effect.damping = _target_reverb_damping
 #endregion
@@ -1271,6 +1307,8 @@ func _update_omni_distance(ray: RayCast3D, idx: int) -> void:
 	_reflection_paths[idx] = []
 	_reflection_escaped[idx] = false
 	_ray_absorptions[idx] = -1.0  # -1 = no hit / escaped
+	_ray_total_absorption[idx] = false
+	_ray_total_absorption_transition_speeds[idx] = _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED
 	_ray_material_names[idx] = ""
 
 	if ray.get_collider() == null:
@@ -1285,12 +1323,17 @@ func _update_omni_distance(ray: RayCast3D, idx: int) -> void:
 	# Sample absorption from the first-hit surface (only if it has a material).
 	var first_absorption := -1.0  # -1 = no material found
 	var first_mat_name := ""
-	if surface_absorption:
-		var collider := ray.get_collider() as Node
-		var ab := AcousticBody.find_for_collider(collider)
-		if ab != null and ab.acoustic_material != null:
-			var mat := ab.acoustic_material
+	var collider := ray.get_collider() as Node
+	var ab := AcousticBody.find_for_collider(collider)
+	if ab != null and ab.acoustic_material != null:
+		var mat := ab.acoustic_material
+		_ray_total_absorption[idx] = mat.total_absorption
+		if mat.total_absorption:
+			_ray_total_absorption_transition_speeds[idx] = mat.total_absorption_transition_speed
+		if surface_absorption:
 			first_absorption = (mat.absorption_low + mat.absorption_mid + mat.absorption_high) / 3.0
+			if mat.total_absorption:
+				first_absorption = 1.0
 			if mat.resource_name != "":
 				first_mat_name = mat.resource_name
 			elif mat.resource_path != "":
@@ -1353,11 +1396,19 @@ func _update_omni_distance(ray: RayCast3D, idx: int) -> void:
 		emit_signal("reverb_ray_collided", hit_point, current_pos, bounce_collider)
 
 		# Sample absorption from the bounced surface (skip if no material).
-		if surface_absorption:
-			var bounce_ab := AcousticBody.find_for_collider(bounce_collider)
-			if bounce_ab != null and bounce_ab.acoustic_material != null:
-				var bmat := bounce_ab.acoustic_material
+		var bounce_ab := AcousticBody.find_for_collider(bounce_collider)
+		if bounce_ab != null and bounce_ab.acoustic_material != null:
+			var bmat := bounce_ab.acoustic_material
+			if bmat.total_absorption:
+				_ray_total_absorption[idx] = true
+				_ray_total_absorption_transition_speeds[idx] = minf(
+					_ray_total_absorption_transition_speeds[idx],
+					bmat.total_absorption_transition_speed
+				)
+			if surface_absorption:
 				var bounce_absorption := (bmat.absorption_low + bmat.absorption_mid + bmat.absorption_high) / 3.0
+				if bmat.total_absorption:
+					bounce_absorption = 1.0
 				absorption_sum += bounce_absorption
 				absorption_count += 1
 
@@ -1447,6 +1498,8 @@ func _update_reverb() -> void:
 	# In outdoor environments, what little reverb remains should decay quickly.
 	# Damping 0.0 = long tail (indoor), 1.0 = short tail (outdoor).
 	var damping := lerpf(0.0, 1.0, _openness)
+	var total_absorption_hit := false
+	var total_absorption_transition_speed := _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED
 
 	#  Surface absorption modulation 
 	# Average the absorption sampled from each omni ray that hit a surface.
@@ -1459,6 +1512,13 @@ func _update_reverb() -> void:
 		for i in range(omni_count):
 			if ignore_floor and i < _ray_directions.size() and _ray_directions[i].y <= -floor_cos_abs:
 				continue
+			if i < _ray_total_absorption.size() and _ray_total_absorption[i]:
+				total_absorption_hit = true
+				if i < _ray_total_absorption_transition_speeds.size():
+					total_absorption_transition_speed = minf(
+						total_absorption_transition_speed,
+						_ray_total_absorption_transition_speeds[i]
+					)
 			if i < _ray_absorptions.size() and _ray_absorptions[i] >= 0.0:
 				abs_sum += _ray_absorptions[i]
 				abs_count += 1
@@ -1469,6 +1529,24 @@ func _update_reverb() -> void:
 			wetness *= lerpf(1.0, 1.0 - avg_abs, absorption_wetness_influence)
 			# Damping: absorptive surfaces increase damping (shorter tail).
 			damping = clampf(damping + avg_abs * absorption_damping_influence, 0.0, 1.0)
+	else:
+		var floor_cos_total := cos(deg_to_rad(floor_angle_threshold))
+		for i in range(omni_count):
+			if ignore_floor and i < _ray_directions.size() and _ray_directions[i].y <= -floor_cos_total:
+				continue
+			if i < _ray_total_absorption.size() and _ray_total_absorption[i]:
+				total_absorption_hit = true
+				if i < _ray_total_absorption_transition_speeds.size():
+					total_absorption_transition_speed = minf(
+						total_absorption_transition_speed,
+						_ray_total_absorption_transition_speeds[i]
+					)
+				break
+
+	if total_absorption_hit:
+		_active_total_absorption_transition_speed = total_absorption_transition_speed
+		wetness = minf(wetness, _TOTAL_ABSORPTION_REVERB_WETNESS_CAP)
+		damping = maxf(damping, _TOTAL_ABSORPTION_REVERB_DAMPING_FLOOR)
 
 	# Emit reverb changes when significant differences occur
 	var prev_room := _last_reverb_room_size
@@ -1491,6 +1569,8 @@ func _update_reverb() -> void:
 #region OCCLUSION (single target raycast)
 
 func _update_lowpass(listener: Node3D) -> void:
+	_hard_muted_by_total_absorption = false
+
 	if _lowpass_filter == null or not audio_occlusion:
 		_target_lowpass_cutoff = float(open_lowpass_cutoff)
 		return
@@ -1563,6 +1643,8 @@ func _update_lowpass(listener: Node3D) -> void:
 	var open_hz := float(open_lowpass_cutoff)
 	var occl_hz := float(occluded_lowpass_cutoff_minimum)
 	var wall_materials : Array[String] = []
+	var total_absorption_blocked := false
+	var total_absorption_transition_speed := _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED
 
 	# Cumulative volume reduction from low-frequency blocking per wall.
 	var vol_reduction_db := 0.0
@@ -1600,6 +1682,15 @@ func _update_lowpass(listener: Node3D) -> void:
 			t_high = mat.transmission_high
 			t_low = mat.transmission_low
 			absorption_weighted = 0.7 * mat.absorption_high + 0.3 * mat.absorption_mid
+			if mat.total_absorption:
+				total_absorption_blocked = true
+				total_absorption_transition_speed = minf(
+					total_absorption_transition_speed,
+					mat.total_absorption_transition_speed
+				)
+				t_high = 0.0
+				t_low = 0.0
+				absorption_weighted = 1.0
 			# Use the resource name, or the file name, or a fallback.
 			if mat.resource_name != "":
 				mat_name = mat.resource_name
@@ -1649,6 +1740,14 @@ func _update_lowpass(listener: Node3D) -> void:
 
 	if wall_count == 0:
 		_target_lowpass_cutoff = open_hz
+		return
+
+	# Any soundproof wall in the path fully occludes direct sound.
+	if total_absorption_blocked:
+		_hard_muted_by_total_absorption = true
+		_active_total_absorption_transition_speed = total_absorption_transition_speed
+		_target_lowpass_cutoff = _TOTAL_ABSORPTION_LOWPASS_HZ
+		_target_volume_db = _TOTAL_ABSORPTION_MUTE_DB
 		return
 
 	# Clamp so combined cutoff never drops below the minimum.

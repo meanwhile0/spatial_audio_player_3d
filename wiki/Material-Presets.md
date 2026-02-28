@@ -1,6 +1,6 @@
 # Material Presets
 
-The plugin ships with 11 built-in `AcousticMaterial` presets as `.tres` files located at:
+The plugin ships with 12 built-in `AcousticMaterial` presets as `.tres` files located at:
 
 ```
 addons/spatial_audio_extended/presets/
@@ -27,6 +27,7 @@ All values are physically derived from acoustic literature. You can use them as-
 | wood | 0.11 | 0.07 | 0.06 |
 | metal | 0.20 | 0.07 | 0.06 |
 | rock | 0.13 | 0.20 | 0.24 |
+| acoustic_foam | 1.00 | 1.00 | 1.00 |
 
 ### Transmission (fraction of energy passing through)
 
@@ -43,6 +44,7 @@ All values are physically derived from acoustic literature. You can use them as-
 | wood | 0.070 | 0.014 | 0.005 |
 | metal | 0.200 | 0.025 | 0.010 |
 | rock | 0.015 | 0.002 | 0.001 |
+| acoustic_foam | 0.000 | 0.000 | 0.000 |
 
 ### Scattering
 
@@ -53,6 +55,19 @@ All presets use a `scattering` value of `0.05`, except:
 | gravel | 0.60 |
 | carpet | 0.57 |
 | rock | 0.20 |
+| acoustic_foam | 0.60 |
+
+### Special
+
+| Preset | total_absorption |
+|---|---|
+| acoustic_foam | true |
+
+### Total-Absorption Transition Speed
+
+| Preset | total_absorption_transition_speed |
+|---|---|
+| acoustic_foam | 1.2 |
 
 ---
 
@@ -70,6 +85,7 @@ All presets use a `scattering` value of `0.05`, except:
 | Metal duct / machinery | `metal` |
 | Cave / outdoor terrain | `rock` or `gravel` |
 | Outdoor ground | `gravel` |
+| Soundproof barrier / booth | `acoustic_foam` |
 
 ---
 

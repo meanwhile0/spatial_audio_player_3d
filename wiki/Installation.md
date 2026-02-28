@@ -26,7 +26,7 @@
  ├── presets/
  │ ├── brick.tres
  │ ├── carpet.tres
- │ └── … (11 presets total)
+ │ └── … (12 presets total)
  └── *.svg (editor icons)
  ```
 

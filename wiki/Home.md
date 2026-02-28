@@ -15,7 +15,7 @@
 | **Wall Occlusion** | Multi-wall detection with material-based lowpass filtering and volume reduction |
 | **Air Absorption** | Distance-based high-frequency rolloff for realism at range |
 | **Sound Speed Delay** | Realistic propagation delay for one-shot sounds (gunshots, explosions, etc.) |
-| **Acoustic Materials** | Physics-based surface properties (absorption, scattering, transmission) with 11 built-in presets |
+| **Acoustic Materials** | Physics-based surface properties (absorption, scattering, transmission) with 12 built-in presets |
 | **Reflection Navigation Agent (Experimental)** | `SpatialReflectionNavigationAgent3D` routes reflected proxy audio around corners in full 3D space |
 | **Debug Overlay** | Runtime HUD, in-editor ray visualisation, radius wireframes, and A/B effect toggle |
 | **Rich Signals** | Zone transitions, occlusion, reverb, air absorption, playback, and diagnostics |
@@ -30,7 +30,7 @@
 - **[[SpatialReflectionNavigationAgent3D Reference]]** — Corner-aware reflected proxy pathing in 3D
 - **[[AcousticBody Reference]]** — Giving surfaces acoustic properties
 - **[[AcousticMaterial Reference]]** — Absorption, scattering, and transmission settings
-- **[[Material Presets]]** — The 11 built-in acoustic material presets
+- **[[Material Presets]]** — The 12 built-in acoustic material presets
 - **[[Signals Reference]]** — Every signal, with arguments and use cases
 - **[[Debug Tools]]** — In-editor visualisation and runtime overlay
 - **[[Tips & Recipes]]** — Common patterns and performance advice

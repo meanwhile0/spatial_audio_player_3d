@@ -41,6 +41,13 @@ Fraction of sound energy that **passes through** the surface. Used by the occlus
 `transmission_high` drives the **lowpass cutoff** — low values heavily muffle high frequencies. 
 `transmission_low` drives the **volume reduction** — low values remove bass energy, reducing overall level.
 
+### Total Absorption
+
+When enabled, the material is treated as **soundproof**:
+
+- Direct-path occlusion through that surface is forced to fully blocked (effectively inaudible).
+- Reverb wetness is heavily reduced and damping is pushed high when these surfaces are sampled by room rays.
+
 ---
 
 ## Exported Properties
@@ -66,6 +73,13 @@ Fraction of sound energy that **passes through** the surface. Used by the occlus
 | `transmission_low` | 0.0–1.0 | `0.100` | Fraction of low-frequency energy passing through (≤ 400 Hz). Affects volume reduction. |
 | `transmission_mid` | 0.0–1.0 | `0.050` | Fraction of mid-frequency energy passing through (400–2 500 Hz). |
 | `transmission_high` | 0.0–1.0 | `0.030` | Fraction of high-frequency energy passing through (≥ 2 500 Hz). Drives the lowpass cutoff. |
+
+### Special
+
+| Property | Range | Default | Description |
+|---|---|---|---|
+| `total_absorption` | `bool` | `false` | Treat this material as soundproof for direct occlusion and suppress reverb wetness. |
+| `total_absorption_transition_speed` | `0.1–20.0` | `2.5` | Fade speed used when entering/leaving total-absorption occlusion. Lower = smoother/slower. |
 
 ---
 
@@ -110,6 +124,7 @@ The `AcousticMaterial` class includes static helper methods that return pre-buil
 | `AcousticMaterial.preset_wood()` | Wood panel |
 | `AcousticMaterial.preset_metal()` | Metal sheet |
 | `AcousticMaterial.preset_rock()` | Natural rock |
+| `AcousticMaterial.preset_acoustic_foam()` | Soundproof acoustic foam |
 
 ```gdscript
 # Use a preset material at runtime

@@ -73,7 +73,7 @@ The falloff curve used between the inner radius and the outer boundary.
 | `max_occlusion_hits` | `int` (1–16) | `4` | Maximum walls detected between emitter and listener. Each wall further muffles the sound. |
 | `fallback_transmission` | `float` (0–1) | `0.030` | Fraction of high-frequency sound that passes through surfaces without an `AcousticBody`. |
 | `occlusion_volume_strength` | `float` (0–1) | `0.35` | How strongly walls reduce volume (in addition to lowpass filtering). |
-| `max_occlusion_volume_reduction` | `float` (0–60 dB) | `18.0` | Maximum total volume reduction from wall occlusion. Prevents complete silence behind many walls. |
+| `max_occlusion_volume_reduction` | `float` (0–60 dB) | `18.0` | Maximum total volume reduction from wall occlusion. Prevents complete silence behind many walls (unless a hit material has `total_absorption = true`). |
 | `occlusion_collision_mask` | `int` (flags) | `1` | Physics layers the occlusion raycast collides with. Can differ from the reverb mask. |
 | `ignore_listener_body` | `bool` | `true` | Automatically exclude the listener's `CharacterBody3D` from occlusion raycasts. |
 
