@@ -17,4 +17,4 @@ jobs:
         with:
           # Whatever directory you choose will be mirrored to the GitHub
           # .wiki.git. The default is .github/wiki.
-          path: wiki
+          path: .github/wiki
