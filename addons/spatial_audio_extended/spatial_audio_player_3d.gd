@@ -249,6 +249,14 @@ var _last_wall_absorptions: Array = []
 ## affect perceived room size.
 @export_flags_3d_physics var occlusion_collision_mask := 1
 
+## Nodes to exclude from occlusion collision checks (node + collision descendants).
+## Useful for excluding the emitting body from occluding itself (i.e. stop doors
+## from occluding their own opening sounds).
+@export var excluded_occlusion_collision_nodes: Array[Node3D] = []:
+	set(value):
+		excluded_occlusion_collision_nodes = value
+		_occlusion_exclusions_dirty = true
+
 ## When enabled, the listener’s [CharacterBody3D] (if any) is automatically
 ## excluded from occlusion raycasts. This prevents the player’s own
 ## collision shapes from being detected as walls.
@@ -545,6 +553,9 @@ var _external_occlusion_hold_until_msec : int = 0
 var _hard_muted_by_total_absorption : bool = false
 var _active_total_absorption_transition_speed : float = _DEFAULT_TOTAL_ABSORPTION_TRANSITION_SPEED
 
+var _occlusion_exclusions_dirty : bool = true
+var _cached_occlusion_exclusions : Array[RID] = []
+
 var _debug_panel : PanelContainer = null
 var _debug_minimized := false
 var _debug_minimize_btn : Button = null
@@ -716,7 +727,7 @@ func _validate_property(property: Dictionary) -> void:
 		property.usage &= ~PROPERTY_USAGE_EDITOR
 
 	# Hide Occlusion children when disabled
-	if not audio_occlusion and property.name in ["occlusion_strength", "max_occlusion_hits", "fallback_transmission", "occlusion_volume_strength", "max_occlusion_volume_reduction", "occlusion_collision_mask", "ignore_listener_body"]:
+	if not audio_occlusion and property.name in ["occlusion_strength", "max_occlusion_hits", "fallback_transmission", "occlusion_volume_strength", "max_occlusion_volume_reduction", "occlusion_collision_mask", "excluded_occlusion_collision_nodes", "ignore_listener_body"]:
 		property.usage &= ~PROPERTY_USAGE_EDITOR
 
 	# Hide Attenuation children when disabled
@@ -1045,6 +1056,37 @@ static func _find_character_body(node: Node) -> CharacterBody3D:
 		current = current.get_parent()
 	return null
 
+func _build_occlusion_exclusions(target: Node3D) -> Array[RID]:
+	if _occlusion_exclusions_dirty:
+		_cached_occlusion_exclusions.clear()
+		var seen := {}
+		_append_collision_rids_recursive(self, _cached_occlusion_exclusions, seen)
+		for node in excluded_occlusion_collision_nodes:
+			_append_collision_rids_recursive(node, _cached_occlusion_exclusions, seen)
+		_occlusion_exclusions_dirty = false
+
+	if not ignore_listener_body or target == null:
+		return _cached_occlusion_exclusions
+
+	var out := _cached_occlusion_exclusions.duplicate()
+	var seen_merge := {}
+	for rid in out:
+		seen_merge[rid] = true
+	var listener_root := _find_character_body(target)
+	if listener_root != null:
+		_append_collision_rids_recursive(listener_root, out, seen_merge)
+	return out
+
+func _append_collision_rids_recursive(node: Node, out: Array[RID], seen: Dictionary) -> void:
+	if node == null:
+		return
+	if node is CollisionObject3D:
+		var rid := (node as CollisionObject3D).get_rid()
+		if not seen.has(rid):
+			seen[rid] = true
+			out.push_back(rid)
+	for child in node.get_children():
+		_append_collision_rids_recursive(child, out, seen)
 
 static func _generate_fibonacci_sphere(count: int) -> Array[Vector3]:
 	## Returns [code]count[/code] unit-length directions evenly distributed
@@ -1628,13 +1670,7 @@ func _update_lowpass(listener: Node3D) -> void:
 	var params := PhysicsRayQueryParameters3D.new()
 	params.collision_mask = occlusion_collision_mask
 	params.collide_with_areas = false
-
-	# Exclude the listener's CharacterBody3D so the player's own collision
-	# shapes aren't detected as walls.
-	if ignore_listener_body:
-		var body := _find_character_body(listener)
-		if body != null:
-			params.exclude = [body.get_rid()]
+	params.exclude = _build_occlusion_exclusions(listener)
 
 	var march_pos := global_position
 	var wall_count := 0
