@@ -75,6 +75,7 @@ The falloff curve used between the inner radius and the outer boundary.
 | `occlusion_volume_strength` | `float` (0–1) | `0.35` | How strongly walls reduce volume (in addition to lowpass filtering). |
 | `max_occlusion_volume_reduction` | `float` (0–60 dB) | `18.0` | Maximum total volume reduction from wall occlusion. Prevents complete silence behind many walls (unless a hit material has `total_absorption = true`). |
 | `occlusion_collision_mask` | `int` (flags) | `1` | Physics layers the occlusion raycast collides with. Can differ from the reverb mask. |
+| `excluded_occlusion_collision_nodes` | `Array[Node3D]` | `[]` | Nodes to exclude from occlusion collision checks (node + collision descendants). Useful for excluding the emitting body from occluding itself (i.e. stop doors from occluding their own opening sounds).
 | `ignore_listener_body` | `bool` | `true` | Automatically exclude the listener's `CharacterBody3D` from occlusion raycasts. |
 
 ### Attenuation
